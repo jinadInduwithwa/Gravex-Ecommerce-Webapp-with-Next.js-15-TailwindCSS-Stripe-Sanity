@@ -25,7 +25,7 @@ const Header = async() => {
         
         <div className="w-auto md:w-1/3 flex items-center justify-center gap-2.5">
          {/* mobile menu */}
-          <MobileMenu/>
+          <MobileMenu />
           {/* logo */}
           <NavLogo>gravex co.</NavLogo>
         </div>

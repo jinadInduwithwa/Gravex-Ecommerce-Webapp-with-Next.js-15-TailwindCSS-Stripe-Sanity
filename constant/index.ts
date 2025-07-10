@@ -1,4 +1,4 @@
-import { title } from "process"
+
 
 
 export const headerData = [
@@ -16,4 +16,19 @@ export const productType = [
   {title : "Pants", value:"pants"},
   {title : "Hoodie", value:"hoodie"},
   {title : "Short", value:"short"},
+]
+
+export const quickLinkData = [
+  {title: "About us", href: "/about"},
+  {title: "Contact us", href: "/contact"},
+  {title: "Terms & Conditions", href: "/terms"},
+  {title: "Privacy Policy", href: "/privacy"},
+  {title: "FAQs", href: "/faqs"},
+]
+
+export const categoriesData = [
+  { title: "Men's Fashion", href: "/men" },
+  { title: "Women's Fashion", href: "/women" },
+  { title: "Accessories", href: "/accessories" },
+  { title: "Other", href: "/other" },
 ]

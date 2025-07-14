@@ -13,7 +13,7 @@ const AddToCartButton = ({product, className}:Props) => {
     const isOutOfStock = product?.stock === 0;
     const itemCount = 0;
   return (
-    <div>
+    <div className='w-full'>
         {
             itemCount ? (
                 <div className='w-full text-sm'>
@@ -28,7 +28,7 @@ const AddToCartButton = ({product, className}:Props) => {
                     </div>
                 </div>
             ):(
-            <Button disabled={isOutOfStock} className={cn("w-full bg-transparent text-black shadow-none border border-black/30 font-semibold tracking-wide hover:text-white hoverEffect")}>
+            <Button disabled={isOutOfStock} className={cn("w-full text-white shadow-none border border-black/30 font-semibold tracking-wide hover:text-white hoverEffect")}>
                 Add To Cart
             </Button>
 

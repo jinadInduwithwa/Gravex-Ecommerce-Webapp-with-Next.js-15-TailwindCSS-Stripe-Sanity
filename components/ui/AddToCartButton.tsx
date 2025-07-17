@@ -1,19 +1,24 @@
+'use client';
 import { Product } from '@/sanity.types'
 import React from 'react'
 import { Button } from './button';
 import { cn } from '@/lib/utils';
 import QuentityButtions from './QuentityButtions';
 import PriceFormatter from './PriceFormatter';
+import useCartStore from '@/sanity/store';
+import { toast } from 'sonner';
 
 interface Props{
     product: Product;
     className?: string;
 }
 const AddToCartButton = ({product, className}:Props) => {
+    const {addItem, getItemCount } = useCartStore();
+    const itemCount = getItemCount(product?._id);
     const isOutOfStock = product?.stock === 0;
-    const itemCount = 0;
+
   return (
-    <div className='w-full'>
+    <div className='w-full h-12 flex items-center'>
         {
             itemCount ? (
                 <div className='w-full text-sm'>
@@ -28,7 +33,7 @@ const AddToCartButton = ({product, className}:Props) => {
                     </div>
                 </div>
             ):(
-            <Button disabled={isOutOfStock} className={cn("w-full text-white shadow-none border border-black/30 font-semibold tracking-wide hover:text-white hoverEffect")}>
+            <Button disabled={isOutOfStock} onClick={()=>{addItem(product); toast.success(`${product?.name?.substring(0,12)} added successfully`) }} className={cn("w-full text-white shadow-none border border-black/30 font-semibold tracking-wide hover:text-white hoverEffect")}>
                 Add To Cart
             </Button>
 

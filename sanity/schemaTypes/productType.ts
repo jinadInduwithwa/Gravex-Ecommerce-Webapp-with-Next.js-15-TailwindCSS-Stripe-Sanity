@@ -1,11 +1,11 @@
-import { TrolleyIcon } from "@sanity/icons";
+// import { TrolleyIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
 export const productType = defineType({
   name: "product",
   title: "Product",
   type: "document",
-  icon: TrolleyIcon,
+  // icon: TrolleyIcon,
   fields: [
     defineField({
       name: "name",
@@ -27,14 +27,7 @@ export const productType = defineType({
       name: "images",
       title: "Product Images",
       type: "array",
-      of: [
-        {
-          type: "image",
-          options: {
-            hotspot: true,
-          },
-        },
-      ],
+      of: [{ type: "image", options: { hotspot: true } }],
     }),
     defineField({
       name: "intro",
@@ -44,7 +37,7 @@ export const productType = defineType({
     defineField({
       name: "description",
       title: "Description",
-      type: "text",
+      type: "string",
     }),
     defineField({
       name: "price",
@@ -54,7 +47,7 @@ export const productType = defineType({
     }),
     defineField({
       name: "discount",
-      title: "Discount Price",
+      title: "Discount Percentage",
       type: "number",
       validation: (Rule) => Rule.required(),
     }),
@@ -62,23 +55,70 @@ export const productType = defineType({
       name: "categories",
       title: "Categories",
       type: "array",
-      of: [
-        {
-          type: "reference",
-          to: [{ type: "category" }],
-        },
-      ],
+      of: [{ type: "reference", to: { type: "category" } }],
     }),
     defineField({
       name: "stock",
-      title: "Stock",
+      title: "Total Stock",
       type: "number",
+      description: "Total stock across all sizes (auto-calculated from sizes array)",
+      readOnly: true,
       validation: (Rule) => Rule.min(0),
+    }),
+    defineField({
+      name: "sizes",
+      title: "Size Variants with Stock",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({
+              name: "size",
+              title: "Size",
+              type: "string",
+              options: {
+                list: [
+                  { title: "XS", value: "xs" },
+                  { title: "S", value: "s" },
+                  { title: "M", value: "m" },
+                  { title: "L", value: "l" },
+                  { title: "XL", value: "xl" },
+                  { title: "2XL", value: "2xl" },
+                  { title: "3XL", value: "3xl" },
+                  { title: "One Size", value: "onesize" },
+                ],
+              },
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "stock",
+              title: "Stock for this Size",
+              type: "number",
+              validation: (Rule) => Rule.required().min(0),
+            }),
+          ],
+          preview: {
+            select: {
+              size: "size",
+              stock: "stock",
+            },
+            prepare(selection) {
+              const { size, stock } = selection;
+              return {
+                title: size?.toUpperCase() || "Size",
+                subtitle: `Stock: ${stock || 0}`,
+              };
+            },
+          },
+        },
+      ],
+      description: "Define available sizes and their individual stock levels",
     }),
     defineField({
       name: "status",
       title: "Product Status",
-      type: "string", 
+      type: "string",
       options: {
         list: [
           { title: "New", value: "new" },
@@ -89,11 +129,11 @@ export const productType = defineType({
     }),
     defineField({
       name: "variant",
-      title: "Variant",
-      type: "string", 
+      title: "Product Type",
+      type: "string",
       options: {
         list: [
-          { title: "T-shirt", value: "tshirt" },
+          { title: "Tshirt", value: "tshirt" },
           { title: "Jacket", value: "jacket" },
           { title: "Pants", value: "pants" },
           { title: "Hoodie", value: "hoodie" },
@@ -102,39 +142,20 @@ export const productType = defineType({
         ],
       },
     }),
-    defineField({
-      name: "size",
-      title: "Available Sizes",
-      type: "array",
-      of: [
-        {
-          type: "string",
-        },
-      ],
-      options: {
-        list: [
-          { title: "XS", value: "XS" },
-          { title: "S", value: "S" },
-          { title: "M", value: "M" },
-          { title: "L", value: "L" },
-          { title: "XL", value: "XL" },
-          { title: "XXL", value: "XXL" },
-        ],
-      },
-    }),
   ],
   preview: {
     select: {
       title: "name",
-      media: "images.0", 
+      media: "images",
       subtitle: "price",
     },
     prepare(selection) {
       const { title, subtitle, media } = selection;
+      const image = media && media[0];
       return {
         title: title,
         subtitle: `$${subtitle}`,
-        media: media,
+        media: image,
       };
     },
   },

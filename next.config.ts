@@ -1,14 +1,10 @@
-import { hostname } from "os";
+import type { NextConfig } from "next";
 
-const nextConfig = {
-  experimental: {
-    allowedDevOrigins: ['http://192.168.56.1:3000'],
+const nextConfig: NextConfig = {
+  /* config options here */
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "cdn.sanity.io" }],
   },
-  images:{
-    remotePatterns:[
-      {protocol:"https", hostname:"cdn.sanity.io"}
-    ]
-  }
-} as any;
+};
 
 export default nextConfig;

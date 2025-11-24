@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { ClerkProvider } from '@clerk/nextjs';
-import { Toaster } from "@/components/ui/sonner";
+import { ClerkProvider } from "@clerk/nextjs";
+import localFont from "next/font/local";
+import { Toaster } from "react-hot-toast";
 
+const raleway = localFont({
+  src: "../fonts/Raleway.woff2",
+  variable: "--font-raleway",
+  weight: "100 900",
+});
 
 export const metadata: Metadata = {
-  title: "Gravex",
-  description: "clothing store",
+  title: "Gravex Co.",
+  description: "The official online clothing store of Gravex Co, offering stylish and affordable fashion."
 };
 
 export default function RootLayout({
@@ -20,20 +25,21 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body
-          className={`antialiased`}
-        >
-          <Header/>
-          
-          <main>{children}</main>
-          <Footer/>
-          <Toaster position="bottom-right" toastOptions={{style:{background: "ffffff", color:"000000"}}}/>
+        <body className={`${raleway.variable} antialiased`}>
+          <Header />
+          {children}
+          <Footer />
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                background: "#000000",
+                color: "#ffffff",
+              },
+            }}
+          />
         </body>
       </html>
-
     </ClerkProvider>
-
-
-    
   );
 }

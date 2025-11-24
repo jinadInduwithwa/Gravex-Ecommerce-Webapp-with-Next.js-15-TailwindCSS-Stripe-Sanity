@@ -1,57 +1,56 @@
-import { currentUser } from "@clerk/nextjs/server";
+import React from "react";
+import HeaderMenu from "./HeaderMenu";
+import Logo from "./Logo";
 import Container from "./Container";
-import NavLogo from "./NavLogo";
-import CartIcon from "./ui/CartIcon";
-import HeaderMenu from "./ui/HeaderMenu";
-import MobileMenu from "./ui/MobileMenu";
-import SearchBar from "./ui/SearchBar";
+import MobileMenu from "./MobileMenu";
+import SearchBar from "./SearchBar";
+import CartIcon from "./CartIcon";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { ClerkLoaded, SignedIn, SignInButton, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
 import { ListOrdered } from "lucide-react";
-import Link from 'next/link'
+import { getAllCategories, getMyOrders } from "@/sanity/helpers/queries";
 
-const Header = async() => {
-
+const Header = async () => {
   const user = await currentUser();
-  console.log("user -", user);
-  
-
+  const { userId } = await auth();
+  const categories = await getAllCategories();
+  let orders = null;
+  if (userId) {
+    orders = await getMyOrders(userId);
+  }
   return (
-    <header className=" border-b border-b-gray-400 py-5 sticky top-0 z-50 bg-white">
-      <Container className="flex flex-row items-center justify-between gap-7 text-gray-700"> 
-
-        {/* left bar */}
-        <HeaderMenu/>
-
-        
+    <header className="border-b border-b-gray-400 py-5 sticky top-0 z-50 bg-white">
+      <Container className="flex items-center justify-between gap-7 text-lightColor">
+        <HeaderMenu categories={categories} />
         <div className="w-auto md:w-1/3 flex items-center justify-center gap-2.5">
-         {/* mobile menu */}
           <MobileMenu />
-          {/* logo */}
-          <NavLogo>gravex co.</NavLogo>
+          <Logo>GRAVEX</Logo>
         </div>
-
-        {/* right bar */}
         <div className="w-auto md:w-1/3 flex items-center justify-end gap-5">
-          <SearchBar/>
-          <CartIcon/>
+          <SearchBar />
+          <CartIcon />
+
           <ClerkLoaded>
             <SignedIn>
-               <Link href={"/orders"} className='group relative'>
-                <ListOrdered className='w-5 h-5 group-hover:text-black hoverEffect'/>
-                <span className='absolute -top-1 -right-1 bg-black text-white h-3.5 w-3.5 rounded-full text-xs font-semibold flex items-center justify-center'>0</span>
+              <Link href={"/orders"} className="group relative">
+                <ListOrdered className="w-5 h-5 group-hover:text-darkColor hoverEffect" />
+                <span className="absolute -top-1 -right-1 bg-darkColor text-white h-3.5 w-3.5 rounded-full text-xs font-semibold flex items-center justify-center">
+                  {orders?.length ? orders?.length : 0}
+                </span>
               </Link>
-              <UserButton/>
+              <UserButton />
             </SignedIn>
-            { !user && (
+            {!user && (
               <SignInButton mode="modal">
-                <button className="text-sm font-semibold hover:text-black hoverEffect">Login</button>
+                <button className="text-sm font-semibold hover:text-darkColor hoverEffect">
+                  Login
+                </button>
               </SignInButton>
-            ) 
-            }
+            )}
           </ClerkLoaded>
         </div>
       </Container>
-        
     </header>
   );
 };

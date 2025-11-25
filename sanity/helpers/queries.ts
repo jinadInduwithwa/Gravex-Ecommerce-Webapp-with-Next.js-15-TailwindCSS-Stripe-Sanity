@@ -1,6 +1,52 @@
 import { defineQuery } from "next-sanity";
 import { sanityFetch } from "../lib/live";
 
+export const getAllBanners = async () => {
+  const ALL_BANNERS_QUERY = defineQuery(
+    `*[_type=="banner" && isActive==true] | order(order asc) {
+      _id,
+      title,
+      description,
+      buttonText,
+      buttonLink,
+      altText,
+      mobileImage {
+        asset->{
+          _id,
+          url
+        },
+        hotspot,
+        crop
+      },
+      tabletImage {
+        asset->{
+          _id,
+          url
+        },
+        hotspot,
+        crop
+      },
+      desktopImage {
+        asset->{
+          _id,
+          url
+        },
+        hotspot,
+        crop
+      }
+    }`
+  );
+  try {
+    const banners = await sanityFetch({
+      query: ALL_BANNERS_QUERY,
+    });
+    return banners.data || [];
+  } catch (error) {
+    console.error("Error fetching banners:", error);
+    return [];
+  }
+};
+
 export const getProductBySlug = async (slug: string) => {
   const PRODUCT_BY_SLUG_QUERY = defineQuery(
     `*[_type == 'product' && slug.current == $slug] | order(name asc) [0]`

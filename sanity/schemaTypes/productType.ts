@@ -66,8 +66,103 @@ export const productType = defineType({
       validation: (Rule) => Rule.min(0),
     }),
     defineField({
+      name: "colors",
+      title: "Color Variants",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({
+              name: "colorName",
+              title: "Color Name",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "colorCode",
+              title: "Color Code (HEX)",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "colorImage",
+              title: "Color Image",
+              type: "image",
+              options: { hotspot: true },
+            }),
+            defineField({
+              name: "sizes",
+              title: "Sizes and Stock for this Color",
+              type: "array",
+              of: [
+                {
+                  type: "object",
+                  fields: [
+                    defineField({
+                      name: "size",
+                      title: "Size",
+                      type: "string",
+                      options: {
+                        list: [
+                          { title: "XS", value: "xs" },
+                          { title: "S", value: "s" },
+                          { title: "M", value: "m" },
+                          { title: "L", value: "l" },
+                          { title: "XL", value: "xl" },
+                          { title: "2XL", value: "2xl" },
+                          { title: "3XL", value: "3xl" },
+                          { title: "One Size", value: "onesize" },
+                        ],
+                      },
+                      validation: (Rule) => Rule.required(),
+                    }),
+                    defineField({
+                      name: "stock",
+                      title: "Stock for this Size",
+                      type: "number",
+                      validation: (Rule) => Rule.required().min(0),
+                    }),
+                  ],
+                  preview: {
+                    select: {
+                      size: "size",
+                      stock: "stock",
+                    },
+                    prepare(selection) {
+                      const { size, stock } = selection;
+                      return {
+                        title: size?.toUpperCase() || "Size",
+                        subtitle: `Stock: ${stock || 0}`,
+                      };
+                    },
+                  },
+                },
+              ],
+              description: "Define sizes and their stock for this color variant",
+            }),
+          ],
+          preview: {
+            select: {
+              colorName: "colorName",
+              colorCode: "colorCode",
+              image: "colorImage",
+            },
+            prepare(selection) {
+              const { colorName, colorCode } = selection;
+              return {
+                title: colorName || "Color",
+                subtitle: colorCode || "No color code",
+              };
+            },
+          },
+        },
+      ],
+      description: "Define color variants with their sizes and stock levels",
+    }),
+    defineField({
       name: "sizes",
-      title: "Size Variants with Stock",
+      title: "Size Variants with Stock (Deprecated - Use Colors)",
       type: "array",
       of: [
         {
@@ -113,7 +208,7 @@ export const productType = defineType({
           },
         },
       ],
-      description: "Define available sizes and their individual stock levels",
+      description: "Legacy field - use Colors field instead",
     }),
     defineField({
       name: "status",

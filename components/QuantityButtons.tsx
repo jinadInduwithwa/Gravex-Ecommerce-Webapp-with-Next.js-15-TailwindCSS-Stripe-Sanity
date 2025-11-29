@@ -8,14 +8,28 @@ import toast from "react-hot-toast";
 
 interface Props {
   product: Product;
+  color?: string;
+  size?: string;
   className?: string;
 }
-const QuantityButtons = ({ product, className }: Props) => {
+const QuantityButtons = ({ product, color, size, className }: Props) => {
   const { addItem, getItemCount, removeItem } = useCartStore();
-  const itemCount = getItemCount(product?._id);
-  const isOutOfStock = product?.stock === 0;
+  const itemCount = getItemCount(product?._id, color, size);
+
+  // Get stock for selected color and size
+  let isOutOfStock = product?.stock === 0;
+  if (color && product?.colors) {
+    const selectedColor = product.colors.find(
+      (c) => c.colorName === color
+    );
+    const selectedSizeStock = selectedColor?.sizes?.find(
+      (s) => s.size === size
+    )?.stock;
+    isOutOfStock = selectedSizeStock === 0 || selectedSizeStock === undefined;
+  }
+
   const handleRemoveProduct = () => {
-    removeItem(product?._id);
+    removeItem(product?._id, color, size);
     if (itemCount > 1) {
       toast.success("Quantity Decreased successfully!");
     } else {
@@ -38,7 +52,7 @@ const QuantityButtons = ({ product, className }: Props) => {
       </span>
       <Button
         onClick={() => {
-          addItem(product);
+          addItem(product, color, size);
           toast.success(
             `${product?.name?.substring(0, 12)}... added successfully!`
           );

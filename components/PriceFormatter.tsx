@@ -5,8 +5,13 @@ interface Props {
   className?: string;
 }
 const PriceFormatter = ({ amount, className }: Props) => {
+  // Don't display if amount is 0 or undefined
+  if (!amount || amount === 0) {
+    return null;
+  }
+
   const formattedPrice = new Number(amount).toLocaleString("en-US", {
-    currency: "USD",
+    currency: "LKR",
     style: "currency",
     minimumFractionDigits: 2,
   });

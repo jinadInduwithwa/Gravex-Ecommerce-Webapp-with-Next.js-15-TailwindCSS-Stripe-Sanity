@@ -134,6 +134,27 @@ export type Product = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "category";
   }>;
+  colors?: Array<{
+    colorName?: string;
+    colorCode?: string;
+    colorImage?: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    };
+    sizes?: Array<{
+      size?: "xs" | "s" | "m" | "l" | "xl" | "2xl" | "3xl" | "onesize";
+      stock?: number;
+      _key: string;
+    }>;
+    _key: string;
+  }>;
   stock?: number;
   sizes?: Array<{
     size?: "xs" | "s" | "m" | "l" | "xl" | "2xl" | "3xl" | "onesize";

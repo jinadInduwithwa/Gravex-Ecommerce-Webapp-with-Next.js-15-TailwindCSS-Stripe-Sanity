@@ -2,14 +2,10 @@ import AddToCartButton from "@/components/AddToCartButton";
 import Container from "@/components/Container";
 import ImageView from "@/components/ImageView";
 import PriceView from "@/components/PriceView";
-import ProductCharacteristics from "@/components/ProductCharacteristics";
+import ProductInfoModals from "@/components/ProductInfoModals";
 import { getProductBySlug } from "@/sanity/helpers/queries";
 import {
-  BoxIcon,
-  FileQuestion,
   Heart,
-  ListOrderedIcon,
-  Share,
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -50,49 +46,14 @@ const SingleProductPage = async ({
         <div className="flex items-center gap-2.5 lg:gap-5">
           <AddToCartButton
             product={product}
+            size="large"
             className="bg-darkColor/80 text-white hover:bg-darkColor hoverEffect"
           />
-          <button className="border-2 border-darkColor/30 text-darkColor/60 px-2.5 py-1.5 rounded-md hover:text-darkColor hover:border-darkColor hoverEffect">
-            <Heart className="w-5 h-5" />
-          </button>
+
         </div>
-        <ProductCharacteristics product={product} />
-        <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-b-gray-200 py-5 -mt-2">
-          <div className="flex items-center gap-2 text-sm text-black hover:text-red-600 hoverEffect">
-            <BoxIcon className="w-5 h-5" />
-            <p>Compare color</p>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-black hover:text-red-600 hoverEffect">
-            <FileQuestion className="w-5 h-5" />
-            <p>Ask a question</p>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-black hover:text-red-600 hoverEffect">
-            <ListOrderedIcon className="w-5 h-5" />
-            <p>Delivery & Return</p>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-black hover:text-red-600 hoverEffect">
-            <Share className="w-5 h-5" />
-            <p>Share</p>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-5">
-          <div className="border border-darkBlue/20 text-center p-3 hover:border-darkBlue rounded-md hoverEffect">
-            <p className="text-base font-semibold text-darkColor">
-              Free Shipping
-            </p>
-            <p className="text-sm text-gray-500">
-              Free shipping over order $120
-            </p>
-          </div>
-          <div className="border border-darkBlue/20 text-center p-3 hover:border-darkBlue rounded-md hoverEffect">
-            <p className="text-base font-semibold text-darkColor">
-              Flexible Payment
-            </p>
-            <p className="text-sm text-gray-500">
-              Pay with Multiple Credit Cards
-            </p>
-          </div>
-        </div>
+
+        {/* Product Info Buttons */}
+        <ProductInfoModals product={product} />
       </div>
     </Container>
   );

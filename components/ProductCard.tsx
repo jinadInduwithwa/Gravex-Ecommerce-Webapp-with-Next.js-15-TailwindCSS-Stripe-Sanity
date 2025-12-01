@@ -9,9 +9,9 @@ import AddToCartButton from "./AddToCartButton";
 const ProductCard = ({ product }: { product: Product }) => {
   // Calculate total stock from colors
   const totalStock =
-    product?.colors?.reduce((total, color) => {
+    product?.colors?.reduce((total: number, color: { sizes?: Array<{ stock?: number }> }) => {
       const colorStock =
-        color.sizes?.reduce((sum, size) => sum + (size.stock || 0), 0) || 0;
+        color.sizes?.reduce((sum: number, size: { stock?: number }) => sum + (size.stock || 0), 0) || 0;
       return total + colorStock;
     }, 0) || product?.stock || 0;
 
@@ -43,7 +43,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         {/* Color Indicators */}
         {product?.colors && product.colors.length > 0 && (
           <div className="absolute bottom-2 left-2 right-2 flex gap-1 flex-wrap">
-            {product.colors.slice(0, 5).map((color) => (
+            {product.colors.slice(0, 5).map((color: { colorName?: string; colorCode?: string }) => (
               <div
                 key={color.colorName}
                 title={color.colorName}

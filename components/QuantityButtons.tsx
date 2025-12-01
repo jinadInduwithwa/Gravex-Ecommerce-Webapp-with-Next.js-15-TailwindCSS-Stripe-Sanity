@@ -20,10 +20,10 @@ const QuantityButtons = ({ product, color, size, className }: Props) => {
   let isOutOfStock = product?.stock === 0;
   if (color && product?.colors) {
     const selectedColor = product.colors.find(
-      (c) => c.colorName === color
+      (c: { colorName?: string; sizes?: Array<{ size?: string; stock?: number }> }) => c.colorName === color
     );
     const selectedSizeStock = selectedColor?.sizes?.find(
-      (s) => s.size === size
+      (s: { size?: string; stock?: number }) => s.size === size
     )?.stock;
     isOutOfStock = selectedSizeStock === 0 || selectedSizeStock === undefined;
   }

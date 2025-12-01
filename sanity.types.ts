@@ -134,27 +134,6 @@ export type Product = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "category";
   }>;
-  colors?: Array<{
-    colorName?: string;
-    colorCode?: string;
-    colorImage?: {
-      asset?: {
-        _ref: string;
-        _type: "reference";
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-      };
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      _type: "image";
-    };
-    sizes?: Array<{
-      size?: "xs" | "s" | "m" | "l" | "xl" | "2xl" | "3xl" | "onesize";
-      stock?: number;
-      _key: string;
-    }>;
-    _key: string;
-  }>;
   stock?: number;
   sizes?: Array<{
     size?: "xs" | "s" | "m" | "l" | "xl" | "2xl" | "3xl" | "onesize";
@@ -253,8 +232,11 @@ export type Slug = {
 export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | Order | Product | Category | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata | Slug;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./sanity/helpers/queries.ts
+// Variable: ALL_BANNERS_QUERY
+// Query: *[_type=="banner" && isActive==true] | order(order asc) {      _id,      title,      description,      buttonText,      buttonLink,      altText,      mobileImage {        asset->{          _id,          url        },        hotspot,        crop      },      tabletImage {        asset->{          _id,          url        },        hotspot,        crop      },      desktopImage {        asset->{          _id,          url        },        hotspot,        crop      }    }
+export type ALL_BANNERS_QUERYResult = Array<never>;
 // Variable: PRODUCT_BY_SLUG_QUERY
-// Query: *[_type == 'product' && slug.current == $slug] | order(name asc) [0]
+// Query: *[_type == 'product' && slug.current == $slug] | order(name asc) [0] {      ...,      colors[] {        colorName,        colorCode,        colorImage,        sizes[] {          size,          stock        }      },      sizeGuideImage    }
 export type PRODUCT_BY_SLUG_QUERYResult = {
   _id: string;
   _type: "product";
@@ -294,29 +276,24 @@ export type PRODUCT_BY_SLUG_QUERYResult = {
   }>;
   status?: "hot" | "new" | "sale";
   variant?: "hoodie" | "jacket" | "others" | "pants" | "short" | "tshirt";
+  colors: null;
+  sizeGuideImage: null;
 } | null;
 // Variable: CATEGORIES_QUERY
-// Query: *[_type=="category"] | order(name asc)
+// Query: *[_type=="category"] | order(title asc) {      _id,      title,      slug,      description,      image {        asset->{          _id,          url        },        hotspot,        crop      }    }
 export type CATEGORIES_QUERYResult = Array<{
   _id: string;
-  _type: "category";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  description?: string;
-  image?: {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  };
+  title: string | null;
+  slug: Slug | null;
+  description: string | null;
+  image: {
+    asset: {
+      _id: string;
+      url: string | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+  } | null;
 }>;
 // Variable: MY_ORDERS_QUERY
 // Query: *[_type == 'order' && clerkUserId == $userId] | order(orderData desc){    ...,products[]{      ...,product->    }  }
@@ -393,8 +370,9 @@ export type MY_ORDERS_QUERYResult = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "*[_type == 'product' && slug.current == $slug] | order(name asc) [0]": PRODUCT_BY_SLUG_QUERYResult;
-    "*[_type==\"category\"] | order(name asc)": CATEGORIES_QUERYResult;
+    "*[_type==\"banner\" && isActive==true] | order(order asc) {\n      _id,\n      title,\n      description,\n      buttonText,\n      buttonLink,\n      altText,\n      mobileImage {\n        asset->{\n          _id,\n          url\n        },\n        hotspot,\n        crop\n      },\n      tabletImage {\n        asset->{\n          _id,\n          url\n        },\n        hotspot,\n        crop\n      },\n      desktopImage {\n        asset->{\n          _id,\n          url\n        },\n        hotspot,\n        crop\n      }\n    }": ALL_BANNERS_QUERYResult;
+    "*[_type == 'product' && slug.current == $slug] | order(name asc) [0] {\n      ...,\n      colors[] {\n        colorName,\n        colorCode,\n        colorImage,\n        sizes[] {\n          size,\n          stock\n        }\n      },\n      sizeGuideImage\n    }": PRODUCT_BY_SLUG_QUERYResult;
+    "*[_type==\"category\"] | order(title asc) {\n      _id,\n      title,\n      slug,\n      description,\n      image {\n        asset->{\n          _id,\n          url\n        },\n        hotspot,\n        crop\n      }\n    }": CATEGORIES_QUERYResult;
     "*[_type == 'order' && clerkUserId == $userId] | order(orderData desc){\n    ...,products[]{\n      ...,product->\n    }\n  }": MY_ORDERS_QUERYResult;
   }
 }

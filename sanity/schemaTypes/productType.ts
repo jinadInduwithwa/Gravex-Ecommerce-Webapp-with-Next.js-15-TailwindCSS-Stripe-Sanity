@@ -40,6 +40,13 @@ export const productType = defineType({
       type: "string",
     }),
     defineField({
+      name: "sizeGuideImage",
+      title: "Size Guide Image",
+      type: "image",
+      description: "Image showing the size guide/chart for this product",
+      options: { hotspot: true },
+    }),
+    defineField({
       name: "price",
       title: "Product Price",
       type: "number",

@@ -11,9 +11,10 @@ import useCartStore from "@/store";
 interface Props {
   product: Product;
   className?: string;
+  size?: "compact" | "large"; // 'compact' for product cards, 'large' for product page
 }
 
-const AddToCartButton = ({ product, className }: Props) => {
+const AddToCartButton = ({ product, className, size = "compact" }: Props) => {
   const { addItem, getItemCount } = useCartStore();
   const [selectedColor, setSelectedColor] = useState<string | undefined>(
     product?.colors?.[0]?.colorName
@@ -26,14 +27,22 @@ const AddToCartButton = ({ product, className }: Props) => {
 
   // Get available sizes for selected color
   const availableSizes = product?.colors?.find(
-    (c) => c.colorName === selectedColor
+    (c: { colorName?: string; sizes?: Array<{ size?: string; stock?: number }> }) => c.colorName === selectedColor
   )?.sizes;
 
   // Calculate stock for selected color and size
   const selectedSizeStock = availableSizes?.find(
-    (s) => s.size === selectedSize
+    (s: { size?: string; stock?: number }) => s.size === selectedSize
   )?.stock;
   const isOutOfStock = selectedSizeStock === 0 || selectedSizeStock === undefined;
+
+  // Size-based styling
+  const isLarge = size === "large";
+  const colorButtonSize = isLarge ? "w-10 h-10" : "w-7 h-7";
+  const colorLabelSize = isLarge ? "text-sm" : "text-xs";
+  const sizeButtonSize = isLarge ? "px-3 py-2 text-sm" : "px-2 py-1 text-xs";
+  const gapSize = isLarge ? "gap-2.5" : "gap-1.5";
+  const gapSmall = isLarge ? "gap-1.5" : "gap-0.5";
 
   const handleAddToCart = () => {
     if (!selectedColor || !selectedSize) {
@@ -49,14 +58,14 @@ const AddToCartButton = ({ product, className }: Props) => {
   // If product has colors, show color and size selector
   if (product?.colors && product.colors.length > 0) {
     return (
-      <div className="w-full flex flex-col gap-1.5">
+      <div className={cn("w-full flex flex-col", gapSize)}>
         {/* Color Selection */}
-        <div className="flex flex-col gap-0.5">
-          <label className="text-xs font-semibold text-darkColor">
+        <div className={cn("flex flex-col", gapSmall)}>
+          <label className={cn("font-semibold text-darkColor", colorLabelSize)}>
             Color: <span className="font-normal">{selectedColor}</span>
           </label>
-          <div className="flex gap-1.5 flex-wrap">
-            {product.colors.map((color) => (
+          <div className={cn("flex flex-wrap", gapSize)}>
+            {product.colors.map((color: { colorName?: string; colorCode?: string; sizes?: Array<{ size?: string; stock?: number }> }) => (
               <button
                 key={color.colorName}
                 onClick={() => {
@@ -64,7 +73,8 @@ const AddToCartButton = ({ product, className }: Props) => {
                   setSelectedSize(color.sizes?.[0]?.size);
                 }}
                 className={cn(
-                  "w-7 h-7 rounded-full border-2 transition-all",
+                  "rounded-full border-2 transition-all",
+                  colorButtonSize,
                   selectedColor === color.colorName
                     ? "border-darkColor"
                     : "border-gray-300 hover:border-gray-400"
@@ -79,18 +89,19 @@ const AddToCartButton = ({ product, className }: Props) => {
         </div>
 
         {/* Size Selection */}
-        <div className="flex flex-col gap-0.5">
-          <label className="text-xs font-semibold text-darkColor">
+        <div className={cn("flex flex-col", gapSmall)}>
+          <label className={cn("font-semibold text-darkColor", colorLabelSize)}>
             Size: <span className="font-normal">{selectedSize?.toUpperCase()}</span>
           </label>
-          <div className="flex gap-1 flex-wrap">
-            {availableSizes?.map((size) => (
+          <div className={cn("flex flex-wrap", gapSize)}>
+            {availableSizes?.map((size: { size?: string; stock?: number }) => (
               <button
                 key={size.size}
                 onClick={() => setSelectedSize(size.size)}
                 disabled={size.stock === 0}
                 className={cn(
-                  "px-2 py-1 border rounded-md text-xs font-semibold transition-all",
+                  "border rounded-md font-semibold transition-all",
+                  sizeButtonSize,
                   selectedSize === size.size
                     ? "bg-darkColor text-white border-darkColor"
                     : "border-gray-300 text-darkColor hover:border-darkColor",
@@ -106,21 +117,25 @@ const AddToCartButton = ({ product, className }: Props) => {
         {/* Add to Cart or Quantity Buttons */}
         <div className="w-full flex items-center">
           {isOutOfStock && itemCount === 0 ? (
-            <p className="w-full text-center text-sm text-red-600 font-semibold py-2">
+            <p className={cn("w-full text-center text-red-600 font-semibold py-2", isLarge ? "text-base" : "text-sm")}>
               Out of stock
             </p>
           ) : itemCount ? (
-            <div className="w-full text-sm">
+            <div className={cn("w-full", isLarge ? "text-base" : "text-sm")}>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Qty:</span>
+                <span className={cn("text-muted-foreground", isLarge ? "text-sm" : "text-xs")}>
+                  {isLarge ? "Quantity:" : "Qty:"}
+                </span>
                 <QuantityButtons
                   product={product}
                   color={selectedColor}
                   size={selectedSize}
                 />
               </div>
-              <div className="flex items-center justify-between border-t pt-1">
-                <span className="text-xs font-semibold">Total</span>
+              <div className="flex items-center justify-between border-t pt-1 mt-1">
+                <span className={cn("font-semibold", isLarge ? "text-sm" : "text-xs")}>
+                  {isLarge ? "Total Price" : "Total"}
+                </span>
                 <PriceFormatter
                   amount={product?.price ? product?.price * itemCount : 0}
                 />
@@ -131,10 +146,11 @@ const AddToCartButton = ({ product, className }: Props) => {
               onClick={handleAddToCart}
               className={cn(
                 "w-full bg-darkColor text-white shadow-none border-none font-semibold tracking-wide hover:bg-darkColor/90 transition-colors hoverEffect",
+                isLarge ? "text-base py-3" : "text-sm",
                 className
               )}
             >
-              Quick Pick
+              {isLarge ? "Add to Cart" : "Quick Pick"}
             </Button>
           )}
         </div>

@@ -105,6 +105,44 @@ export const getAllCategories = async () => {
   }
 };
 
+export const getProductsByCategory = async (categorySlug: string) => {
+  if (!categorySlug) {
+    return [];
+  }
+  const PRODUCTS_BY_CATEGORY_QUERY = defineQuery(
+    `*[_type == 'product' && references(*[_type == 'category' && slug.current == $categorySlug]._id)] {
+      _id,
+      name,
+      slug,
+      price,
+      discount,
+      stock,
+      _createdAt,
+      images[],
+      colors[] {
+        colorName,
+        colorCode,
+        colorImage,
+        sizes[] {
+          size,
+          stock
+        }
+      }
+    }`
+  );
+
+  try {
+    const products = await sanityFetch({
+      query: PRODUCTS_BY_CATEGORY_QUERY,
+      params: { categorySlug },
+    });
+    return products?.data || [];
+  } catch (error) {
+    console.error("Error fetching products by category:", error);
+    return [];
+  }
+};
+
 export const getMyOrders = async (userId: string) => {
   if (!userId) {
     throw new Error("User ID is required");
@@ -124,6 +162,44 @@ export const getMyOrders = async (userId: string) => {
     return orders?.data || [];
   } catch (error) {
     console.error("Error fetching orders:", error);
+    return [];
+  }
+};
+
+export const getProductsByVariant = async (variant: string) => {
+  if (!variant) {
+    return [];
+  }
+  const PRODUCTS_BY_VARIANT_QUERY = defineQuery(
+    `*[_type == 'product' && variant == $variant] {
+      _id,
+      name,
+      slug,
+      price,
+      discount,
+      stock,
+      _createdAt,
+      images[],
+      colors[] {
+        colorName,
+        colorCode,
+        colorImage,
+        sizes[] {
+          size,
+          stock
+        }
+      }
+    }`
+  );
+
+  try {
+    const products = await sanityFetch({
+      query: PRODUCTS_BY_VARIANT_QUERY,
+      params: { variant: variant.toLowerCase() },
+    });
+    return products?.data || [];
+  } catch (error) {
+    console.error("Error fetching products by variant:", error);
     return [];
   }
 };

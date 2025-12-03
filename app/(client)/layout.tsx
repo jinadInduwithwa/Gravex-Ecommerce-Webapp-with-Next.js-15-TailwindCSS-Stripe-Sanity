@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${raleway.variable} antialiased pt-20`}>
+        <body className={`${raleway.variable} antialiased pt-10`}>
           <Header />
           {children}
           <Footer />

@@ -80,3 +80,25 @@
 body {
   font-family: var(--font-raleway);
 }
+
+/* Promotional Bar Animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  animation: marquee linear infinite;
+  display: inline-block;
+  /* Adding a default duration in case inline style is not applied */
+  animation-duration: 20s;
+}
+
+/* Pause animation on hover */
+.promotional-bar:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+.promotional-bar {
+  display: flex;
+}

@@ -3,6 +3,8 @@ import HomeBanner from "@/components/HomeBanner";
 import ProductGrid from "@/components/ProductGrid";
 import CategoryGrid from "@/components/CategoryGrid";
 import PromotionalMessages from "@/components/PromotionalMessages";
+import { QualityCommitment } from "@/components/QualityCommitment";
+
 
 export default function Home() {
   return (
@@ -12,6 +14,8 @@ export default function Home() {
       <Container>
         <ProductGrid />
         <CategoryGrid />
+        <QualityCommitment />
+        
       </Container>
     </div>
   );

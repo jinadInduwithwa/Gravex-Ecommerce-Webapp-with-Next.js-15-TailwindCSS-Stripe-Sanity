@@ -31,6 +31,7 @@ export const categoriesData = [
   { title: "Tshirt", href: "/t-shirt" },
   { title: "Others", href: "/others" },
 ];
+
 export const faqsData = [
   {
     question: "What services does Tulos offer?",
@@ -56,5 +57,24 @@ export const faqsData = [
     question: "How does Tulos ensure data security?",
     answer:
       "We employ industry-standard security measures and comply with all relevant data protection regulations to ensure the security of our clients' data.",
+  },
+];
+
+export const whyData = [
+  {
+    icon: "ShieldCheck",
+    text: "Premium Quality",
+  },
+  {
+    icon: "Award",
+    text: "Award Winning",
+  },
+  {
+    icon: "HeartHandshake",
+    text: "Trusted Partnerships",
+  },
+  {
+    icon: "Sparkles",
+    text: "Crafted Perfection",
   },
 ];

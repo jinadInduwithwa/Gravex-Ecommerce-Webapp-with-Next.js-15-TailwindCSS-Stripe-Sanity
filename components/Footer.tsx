@@ -12,7 +12,7 @@ const Footer = () => {
     <footer className="bg-white border-t">
       <Container>
         <FooterTop />
-        <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 2xl:gap-10">
           <div className="space-y-4">
             <Logo>Gravex Co.</Logo>
             <p className="text-gray-600 text-sm">

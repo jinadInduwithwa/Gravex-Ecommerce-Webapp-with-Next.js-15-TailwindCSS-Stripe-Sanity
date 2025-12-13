@@ -153,12 +153,12 @@ const ProductGrid = () => {
   const getGridClasses = () => {
     switch (viewType) {
       case "compact":
-        return "grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3 lg:gap-4";
+        return "grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-4";
       case "showcase":
-        return "grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10";
+        return "grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 md:gap-8 lg:gap-10";
       case "grid":
       default:
-        return "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5";
+        return "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5 2xl:gap-6";
     }
   };
 
@@ -213,7 +213,7 @@ const ProductGrid = () => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-10 min-h-80 space-y-4 text-center bg-gray-100 rounded-lg w-full">
               <div className="flex items-center space-x-2 text-blue-600">
-                <Loader2 className="animate-spin" />  
+                <Loader2 className="animate-spin" />
               </div>
             </div>
           ) : (

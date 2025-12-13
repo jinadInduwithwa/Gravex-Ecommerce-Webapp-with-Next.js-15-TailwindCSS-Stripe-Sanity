@@ -2,15 +2,21 @@
 import useCartStore from "@/store";
 import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const CartIcon = () => {
   const { items } = useCartStore();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <Link href={"/cart"} className="group relative">
       <ShoppingBag className="w-5 h-5 group-hover:text-darkColor hoverEffect" />
       <span className="absolute -top-1 -right-1 bg-darkColor text-white h-3.5 w-3.5 rounded-full text-xs font-semibold flex items-center justify-center">
-        {items.length ? items.length : 0}
+        {isClient ? (items.length ? items.length : 0) : 0}
       </span>
     </Link>
   );

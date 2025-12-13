@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import Title from "./Title";
 
 interface BannerImage {
@@ -44,20 +43,21 @@ const BannerSlider: React.FC<BannerSliderProps> = ({ banners }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
 
-  if (!banners || banners.length === 0) {
-    return null;
-  }
-
-  // Auto-play functionality
+  // Auto-play functionality - must be called before any early returns
   useEffect(() => {
-    if (!isAutoPlay || banners.length <= 1) return;
+    if (!isAutoPlay || !banners || banners.length <= 1) return;
 
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % banners.length);
     }, 5000);
 
     return () => clearInterval(timer);
-  }, [isAutoPlay, banners.length]);
+  }, [isAutoPlay, banners]);
+
+  // Early return AFTER all hooks
+  if (!banners || banners.length === 0) {
+    return null;
+  }
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
@@ -72,6 +72,7 @@ const BannerSlider: React.FC<BannerSliderProps> = ({ banners }) => {
   const goToNext = () => {
     goToSlide((currentIndex + 1) % banners.length);
   };
+
 
   return (
     <div
@@ -91,7 +92,7 @@ const BannerSlider: React.FC<BannerSliderProps> = ({ banners }) => {
         ))}
       </div>
 
-     
+
 
       {/* Dots Navigation */}
       {banners.length > 1 && (
@@ -100,11 +101,10 @@ const BannerSlider: React.FC<BannerSliderProps> = ({ banners }) => {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`rounded-full transition-all duration-300 backdrop-blur-sm ${
-                index === currentIndex
-                  ? "bg-white w-10 h-3"
-                  : "bg-white/50 w-3 h-3 hover:bg-white/75"
-              }`}
+              className={`rounded-full transition-all duration-300 backdrop-blur-sm ${index === currentIndex
+                ? "bg-white w-10 h-3"
+                : "bg-white/50 w-3 h-3 hover:bg-white/75"
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
@@ -122,9 +122,8 @@ interface BannerSlideProps {
 const BannerSlide: React.FC<BannerSlideProps> = ({ banner, isActive }) => {
   return (
     <div
-      className={`absolute inset-0 transition-opacity duration-500 ${
-        isActive ? "opacity-100" : "opacity-0"
-      }`}
+      className={`absolute inset-0 transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"
+        }`}
     >
       {/* Image with responsive srcset */}
       <picture>
@@ -159,7 +158,7 @@ const BannerSlide: React.FC<BannerSlideProps> = ({ banner, isActive }) => {
 
       {/* Overlay Gradient - More Sophisticated */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-      
+
       {/* Additional overlay for depth */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 

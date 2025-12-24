@@ -2,7 +2,6 @@
 import Container from "@/components/Container";
 import EmptyCart from "@/components/EmptyCart";
 import Loading from "@/components/Loading";
-import NoAccessToCart from "@/components/NoAccessToCart";
 import PriceFormatter from "@/components/PriceFormatter";
 import QuantityButtons from "@/components/QuantityButtons";
 import { Button } from "@/components/ui/button";
@@ -15,31 +14,20 @@ import {
 } from "@/components/ui/tooltip";
 import { urlFor } from "@/sanity/lib/image";
 import useCartStore from "@/store";
-import { useAuth, useUser } from "@clerk/nextjs";
-import { Heart, ShoppingBag, Trash } from "lucide-react";
+import { ShoppingBag, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import paypalLogo from "@/images/paypalLogo.png";
-import {
-  createCheckoutSession,
-  Metadata,
-} from "@/actions/createCheckoutSession";
 
 const CartPage = () => {
   const [isClient, setIsClient] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { isSignedIn } = useAuth();
   const {
     deleteCartProduct,
     getTotalPrice,
-    getItemCount,
     getSubtotalPrice,
-    resetCart,
     getGroupedItems,
   } = useCartStore();
-  const { user } = useUser();
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -48,242 +36,209 @@ const CartPage = () => {
   }
   const cartProducts = getGroupedItems();
 
-  const handleResetCart = () => {
-    const confirmed = window.confirm("Are you sure to reset your Cart?");
-    if (confirmed) {
-      resetCart();
-      toast.success("Your cart reset successfully!");
-    }
-  };
+
   const handleDeleteProduct = (id: string) => {
     deleteCartProduct(id);
     toast.success("Product deleted successfully!");
   };
 
-  const handleCheckout = async () => {
-    setLoading(true);
-    try {
-      const metadata: Metadata = {
-        orderNumber: crypto.randomUUID(),
-        customerName: user?.fullName ?? "Unknown",
-        customerEmail: user?.emailAddresses[0]?.emailAddress ?? "Unknown",
-        clerkUserId: user!.id,
-      };
-      const checkoutUrl = await createCheckoutSession(cartProducts, metadata);
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      }
-    } catch (error) {
-      console.error("Error creating checkout session:", error);
-    } finally {
-      setLoading(false);
-    }
+  const handleWhatsAppOrder = () => {
+    const phoneNumber = "94716090011"; // Updated WhatsApp business number
+
+    let message = "🛒 *New Order Request*\n\n";
+    message += "*Order Details:*\n";
+    message += "─────────────────\n";
+
+    cartProducts.forEach(({ product, quantity, selectedColor, selectedSize }) => {
+      const itemTotal = (product.price as number) * quantity;
+      message += `• ${product.name}\n`;
+      if (selectedColor) message += `  Color: ${selectedColor}\n`;
+      if (selectedSize) message += `  Size: ${selectedSize.toUpperCase()}\n`;
+      message += `  Qty: ${quantity} × Rs.${product.price} = Rs.${itemTotal.toFixed(2)}\n\n`;
+    });
+
+    message += "─────────────────\n";
+    message += `*Subtotal:* Rs.${getSubtotalPrice().toFixed(2)}\n`;
+    message += `*Discount:* Rs.${(getSubtotalPrice() - getTotalPrice()).toFixed(2)}\n`;
+    message += `*Total:* Rs.${getTotalPrice().toFixed(2)}\n\n`;
+    message += "Please confirm my order. Thank you!";
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+    window.open(whatsappUrl, "_blank");
   };
 
   return (
     <div className="bg-gray-50 pb-52 md:pb-10">
-      {isSignedIn ? (
-        <Container>
-          {cartProducts?.length ? (
-            <>
-              <div className="flex items-center gap-2 py-5">
-                <ShoppingBag />
-                <h1 className="text-2xl font-semibold">Shopping Cart</h1>
-              </div>
-              <div className="grid lg:grid-cols-3 md:gap-8">
-                {/* Products */}
-                <div className="lg:col-span-2 rounded-lg">
-                  <div className="border bg-white rounded-md">
-                    {cartProducts?.map(({ product }) => {
-                      const itemCount = getItemCount(product?._id);
-                      return (
-                        <div
-                          key={product?._id}
-                          className="border-b p-2.5 last:border-b-0 flex items-center justify-between gap-5"
-                        >
-                          <div className="flex flex-1 items-center gap-2 h-36 md:h-44">
-                            {product?.images && (
-                              <Link
-                                href={`/product/${product?.slug?.current}`}
-                                className="border p-0.5 md:p-1 mr-2 rounded-md overflow-hidden group"
-                              >
-                                <Image
-                                  src={urlFor(product?.images[0]).url()}
-                                  alt="productImage"
-                                  width={500}
-                                  height={500}
-                                  loading="lazy"
-                                  className="w-32 md:w-40 h-32 md:h-40 object-cover group-hover:scale-105 overflow-hidden hoverEffect"
-                                />
-                              </Link>
-                            )}
-                            <div className="h-full flex flex-1 items-start flex-col justify-between py-1">
-                              <div className="space-y-1.5">
-                                <h2 className="font-semibold line-clamp-1">
-                                  {product?.name}
-                                </h2>
-                                <p className="text-sm text-lightColor font-medium">
-                                  {product?.intro}
-                                </p>
-                                <p className="text-sm capitalize">
-                                  Variant:{" "}
-                                  <span className="font-semibold">
-                                    {product.variant}
-                                  </span>
-                                </p>
-                                <p className="text-sm capitalize">
-                                  Status:{" "}
-                                  <span className="font-semibold">
-                                    {product?.status}
-                                  </span>
-                                </p>
-                              </div>
-                              <div className="text-gray-500 flex items-center gap-2">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Heart className="w-4 h-4 md:w-5 md:h-5 hover:text-green-600 hoverEffect" />
-                                    </TooltipTrigger>
-                                    <TooltipContent className="font-bold">
-                                      Add to Favorite
-                                    </TooltipContent>
-                                  </Tooltip>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Trash
-                                        onClick={() =>
-                                          handleDeleteProduct(product?._id)
-                                        }
-                                        className="w-4 h-4 md:w-5 md:h-5 hover:text-red-600 hoverEffect"
-                                      />
-                                    </TooltipTrigger>
-                                    <TooltipContent className="font-bold bg-red-600">
-                                      Delete product
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </div>
-                            </div>
-                            <div className="flex flex-col items-start justify-between h-36 md:h-44 p-0.5 md:p-1">
-                              <PriceFormatter
-                                amount={(product?.price as number) * itemCount}
-                                className="font-bold text-lg"
+      <Container>
+        {cartProducts?.length ? (
+          <>
+            <div className="grid lg:grid-cols-3 md:gap-9 py-2 mt-10">
+              {/* Products */}
+              <div className="lg:col-span-2 rounded-sm">
+                <div className="border bg-white rounded-sm">
+                  {cartProducts?.map(({ product, quantity, selectedColor, selectedSize }, index) => {
+                    return (
+                      <div
+                        key={`${product?._id}-${selectedColor}-${selectedSize}-${index}`}
+                        className="border-b p-2.5 last:border-b-0 flex items-center justify-between gap-3 md:gap-5"
+                      >
+                        <div className="flex flex-1 items-center gap-2 h-28 md:h-44">
+                          {product?.images && (
+                            <Link
+                              href={`/product/${product?.slug?.current}`}
+                              className="border p-0.5 md:p-1 mr-2 rounded-sm overflow-hidden group"
+                            >
+                              <Image
+                                src={urlFor(product?.images[0]).url()}
+                                alt="productImage"
+                                width={500}
+                                height={500}
+                                loading="lazy"
+                                className="w-20 h-20 md:w-40 md:h-40 object-cover group-hover:scale-105 overflow-hidden hoverEffect"
                               />
-                              <QuantityButtons product={product} />
+                            </Link>
+                          )}
+                          <div className="h-full flex flex-1 items-start flex-col justify-between py-1">
+                            <div className="space-y-1.5">
+                              <h2 className="font-semibold line-clamp-1 text-sm md:text-base">
+                                {product?.name}
+                              </h2>
+                              <p className="text-xs md:text-sm text-lightColor font-medium line-clamp-2">
+                                {product?.intro}
+                              </p>
+                              <p className="text-xs md:text-sm capitalize">
+                                {selectedColor && (
+
+                                  <span className="font-semibold">
+                                    {selectedColor} {"/"}
+                                  </span>
+
+                                )}
+
+                                {selectedSize && (
+                                  <span className="font-semibold uppercase">
+                                    {selectedSize}
+                                  </span>
+                                )}
+                              </p>
+                              <PriceFormatter
+                                amount={(product?.price as number) * quantity}
+                                className="font-bold text-sm md:hidden"
+                              />
+                            </div>
+                            <div className="text-gray-500 flex items-center gap-2">
+
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Trash
+                                      onClick={() =>
+                                        handleDeleteProduct(product?._id)
+                                      }
+                                      className="w-4 h-4 md:w-5 md:h-5 hover:text-red-600 hoverEffect"
+                                    />
+                                  </TooltipTrigger>
+                                  <TooltipContent className="font-bold bg-red-600">
+                                    Delete product
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end justify-between h-28 md:h-44 p-0.5 md:p-1 ml-auto">
+                            <PriceFormatter
+                              amount={(product?.price as number) * quantity}
+                              className="font-bold text-sm md:text-lg hidden md:block"
+                            />
+                            <div className="scale-90 origin-right md:scale-100">
+                              <QuantityButtons product={product} color={selectedColor} size={selectedSize} />
                             </div>
                           </div>
                         </div>
-                      );
-                    })}
+                      </div>
+                    );
+                  })}
+
+                </div>
+              </div>
+              {/* summary */}
+              <div className="lg:col-span-1">
+                <div className="hidden md:inline-block w-full bg-white p-6 rounded-sm border">
+                  <h2 className="text-xl font-semibold mb-4">
+                    Order Summary
+                  </h2>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <PriceFormatter amount={getSubtotalPrice()} />
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Discount</span>
+                      <PriceFormatter
+                        amount={getSubtotalPrice() - getTotalPrice()}
+                      />
+                    </div>
+                    <Separator />
+                    <div className="flex justify-between">
+                      <span>Total</span>
+                      <PriceFormatter
+                        amount={getTotalPrice()}
+                        className="text-lg font-bold text-black"
+                      />
+                    </div>
                     <Button
-                      onClick={handleResetCart}
-                      className="m-5 font-semibold"
-                      variant="destructive"
+                      onClick={handleWhatsAppOrder}
+                      className="w-full rounded-lg font-semibold tracking-wide bg-black hover:bg-black/80"
+                      size="lg"
                     >
-                      Reset Cart
+                      Order via WhatsApp
                     </Button>
                   </div>
                 </div>
-                {/* summary */}
-                <div className="lg:col-span-1">
-                  <div className="hidden md:inline-block w-full bg-white p-6 rounded-lg border">
-                    <h2 className="text-xl font-semibold mb-4">
-                      Order Summary
-                    </h2>
-                    <div className="space-y-4">
-                      <div className="flex justify-between">
-                        <span>Subtotal</span>
-                        <PriceFormatter amount={getSubtotalPrice()} />
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Discount</span>
-                        <PriceFormatter
-                          amount={getSubtotalPrice() - getTotalPrice()}
-                        />
-                      </div>
-                      <Separator />
-                      <div className="flex justify-between">
-                        <span>Total</span>
-                        <PriceFormatter
-                          amount={getTotalPrice()}
-                          className="text-lg font-bold text-black"
-                        />
-                      </div>
-                      <Button
-                        disabled={loading}
-                        onClick={handleCheckout}
-                        className="w-full rounded-full font-semibold tracking-wide"
-                        size="lg"
-                      >
-                        Proceed to Checkout
-                      </Button>
-                      <Link
-                        href={"/"}
-                        className="flex items-center justify-center py-2 border border-darkColor/50 rounded-full hover:border-darkColor hover:bg-darkColor/5 hoverEffect"
-                      >
-                        <Image
-                          src={paypalLogo}
-                          alt="paypalLogo"
-                          className="w-20"
-                        />
-                      </Link>
+              </div>
+              {/* Order summary for mobile view */}
+              <div className="md:hidden fixed bottom-0 left-0 w-full bg-white pt-2">
+                <div className="p-4 rounded-sm border mx-4">
+                  <h2 className="text-xl font-semibold mb-4">
+                    Order Summary
+                  </h2>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <PriceFormatter amount={getSubtotalPrice()} />
                     </div>
-                  </div>
-                </div>
-                {/* Order summary for mobile view */}
-                <div className="md:hidden fixed bottom-0 left-0 w-full bg-white pt-2">
-                  <div className="p-4 rounded-lg border mx-4">
-                    <h2 className="text-xl font-semibold mb-4">
-                      Order Summary
-                    </h2>
-                    <div className="space-y-4">
-                      <div className="flex justify-between">
-                        <span>Subtotal</span>
-                        <PriceFormatter amount={getSubtotalPrice()} />
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Discount</span>
-                        <PriceFormatter
-                          amount={getSubtotalPrice() - getTotalPrice()}
-                        />
-                      </div>
-                      <Separator />
-                      <div className="flex justify-between">
-                        <span>Total</span>
-                        <PriceFormatter
-                          amount={getTotalPrice()}
-                          className="text-lg font-bold text-black"
-                        />
-                      </div>
-                      <Button
-                        onClick={handleCheckout}
-                        className="w-full rounded-full font-semibold tracking-wide"
-                        size="lg"
-                      >
-                        Proceed to Checkout
-                      </Button>
-                      <Link
-                        href={"/"}
-                        className="flex items-center justify-center py-2 border border-darkColor/50 rounded-full hover:border-darkColor hover:bg-darkColor/5 hoverEffect"
-                      >
-                        <Image
-                          src={paypalLogo}
-                          alt="paypalLogo"
-                          className="w-20"
-                        />
-                      </Link>
+                    <div className="flex justify-between">
+                      <span>Discount</span>
+                      <PriceFormatter
+                        amount={getSubtotalPrice() - getTotalPrice()}
+                      />
                     </div>
+                    <Separator />
+                    <div className="flex justify-between">
+                      <span>Total</span>
+                      <PriceFormatter
+                        amount={getTotalPrice()}
+                        className="text-lg font-bold text-black"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleWhatsAppOrder}
+                      className="w-full rounded-lg font-semibold tracking-wide bg-black hover:bg-black/80"
+                      size="lg"
+                    >
+                      Order via WhatsApp
+                    </Button>
                   </div>
                 </div>
               </div>
-            </>
-          ) : (
-            <EmptyCart />
-          )}
-        </Container>
-      ) : (
-        <NoAccessToCart />
-      )}
+            </div>
+          </>
+        ) : (
+          <EmptyCart />
+        )}
+      </Container>
     </div>
   );
 };

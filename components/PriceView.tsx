@@ -11,21 +11,21 @@ interface Props {
 const PriceView = ({ price, discount, className }: Props) => {
   // Calculate discounted price
   const discountedPrice = price && discount ? price - (discount * price) / 100 : price;
-  
+
   // Don't show if there's no valid price
   if (!discountedPrice || discountedPrice === 0) {
     return null;
   }
-  
+
   return (
     <div className="flex flex-col gap-0.5">
       {/* Show discounted price (larger, bold) */}
-      <PriceFormatter 
-        amount={discountedPrice} 
-        className={cn("font-bold text-base sm:text-lg", className)} 
+      <PriceFormatter
+        amount={discountedPrice}
+        className={cn("font-bold text-base sm:text-lg", className)}
       />
       {/* Show original price (smaller, strikethrough) only if there's a discount */}
-      {price && discount && discount > 0 && (
+      {price && discount !== undefined && discount > 0 && (
         <PriceFormatter
           amount={price}
           className={cn("line-through font-medium text-zinc-500 text-xs", className)}

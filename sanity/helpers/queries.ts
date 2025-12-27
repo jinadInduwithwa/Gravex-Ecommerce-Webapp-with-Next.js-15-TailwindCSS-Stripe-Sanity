@@ -47,6 +47,51 @@ export const getAllBanners = async () => {
   }
 };
 
+export const getPromoBanner = async () => {
+  const PROMO_BANNER_QUERY = defineQuery(
+    `*[_type=="promoBanner" && isActive==true] [0] {
+      _id,
+      title,
+      linkUrl,
+      altText,
+      mobileImage {
+        asset->{
+          _id,
+          url
+        },
+        hotspot,
+        crop
+      },
+      tabletImage {
+        asset->{
+          _id,
+          url
+        },
+        hotspot,
+        crop
+      },
+      desktopImage {
+        asset->{
+          _id,
+          url
+        },
+        hotspot,
+        crop
+      }
+    }`
+  );
+  try {
+    const promoBanner = await sanityFetch({
+      query: PROMO_BANNER_QUERY,
+    });
+    return promoBanner.data || null;
+  } catch (error) {
+    console.error("Error fetching promo banner:", error);
+    return null;
+  }
+};
+
+
 export const getProductBySlug = async (slug: string) => {
   const PRODUCT_BY_SLUG_QUERY = defineQuery(
     `*[_type == 'product' && slug.current == $slug] | order(name asc) [0] {

@@ -13,7 +13,7 @@ const NoProductsAvailable = ({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center py-10 min-h-80 space-y-4 text-center bg-gray-100 rounded-lg w-full mt-10",
+        "flex flex-col items-center justify-center py-10 min-h-80 space-y-4 text-center w-full mt-10",
         className
       )}
     >
@@ -38,14 +38,6 @@ const NoProductsAvailable = ({
         </span>{" "}
         criteria at the moment.
       </motion.p>
-      <motion.div
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
-        className="flex items-center space-x-2 text-blue-600"
-      >
-        <Loader2 className="w-4 h-4 animate-spin" />{" "}
-        <span>We&apos;re restocking shortly</span>
-      </motion.div>
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
